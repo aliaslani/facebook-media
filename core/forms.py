@@ -1,6 +1,6 @@
 from django.forms import Form, ModelForm
 from django import forms
-from core.models import Post
+from core.models import Post, TaggedUser, Comment
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Submit, Layout, Field
 
@@ -9,6 +9,7 @@ class NewPostForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
+        self.helper.form_tag = False
         # self.helper.layout = Layout(
         #     'title',
         #     'content',
@@ -28,9 +29,8 @@ class NewPostForm(ModelForm):
                 'content',
                 'subject',
             ),
-            Submit('submit', 'Submit', css_class='btn btn-primary')
+            # Submit('submit', 'Submit', css_class='btn btn-primary')
             )
-        self.helper.form_tag = False
 
     class Meta:
         model = Post
@@ -66,3 +66,28 @@ class NewPostForm(ModelForm):
                 raise forms.ValidationError('Content should not contain the title.')
         return cleaned_data
 
+
+
+class TaggedUserForm(ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag= False
+    class Meta:
+        model = TaggedUser
+        fields = ['user']
+
+
+class CommentForm(ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag= False
+    class Meta:
+        model = Comment
+        fields = ['body']
+        widgets = {
+            'body': forms.Textarea(attrs={'class':'form-control', 'cols':30, 'rows':4}),
+        }

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Post
+from core.models import Post, Comment
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -10,3 +10,10 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Post, PostAdmin)
+
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['post', 'user', 'body']
+    search_fields = ['post','user']
+    readonly_fields = ['user']
+
+admin.site.register(Comment, CommentAdmin)

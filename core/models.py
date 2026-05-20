@@ -27,7 +27,21 @@ class Comment(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
     body = models.CharField(max_length=1024)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comment by {self.user} on {self.post}'
+    
+    class Meta:
+        verbose_name = 'کامنت'
+        verbose_name_plural = 'کامنت ها'
+        ordering = ['-created_at']
+    
 
 
 
+
+class TaggedUser(models.Model):
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='tagged_users')
+    user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
 
