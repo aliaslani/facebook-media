@@ -15,3 +15,24 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+
+class Platform_Choice(models.TextChoices):
+    FACEBOOK = 'FB', 'Facebook'
+    TWITTER = 'TW', 'Twitter'
+    INSTAGRAM = 'IG', 'Instagram'
+    LINKEDIN = 'LI', 'LinkedIn'
+    GITHUB = 'GH', 'GitHub'
+    OTHER = 'OT', 'Other'
+
+class SocialLink(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='social_links')
+    platform = models.CharField(max_length=2, choices=Platform_Choice.choices)
+    url = models.URLField()
+
+    def __str__(self):
+        return f"{self.get_platform_display()} - {self.url}"
+
+
+
+

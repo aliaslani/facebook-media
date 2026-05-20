@@ -1,0 +1,15 @@
+post_confirm_delete.html
+{% extends 'core/base.html' %}
+{% block title %}Confirm Delete{% endblock %}
+
+{% block main %}
+<div class="container mt-5">
+    <h2>Confirm Delete</h2>
+    <p>Are you sure you want to delete the post titled "{{ object.title }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'post_table' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

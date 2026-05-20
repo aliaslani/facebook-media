@@ -1,18 +1,22 @@
 from django.shortcuts import render
 from core.models import Post, Comment
-from django.views.generic import ListView, DetailView, CreateView, FormView
+from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView, DeleteView
 from core.forms import NewPostForm, CommentForm, Comment
 from django_tables2 import SingleTableView
 from core.tables import PostTable
 from core.tables import CommentTable
 from django.db.models import Count
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 class PostListView(ListView):
     model = Post
     template_name = 'core/post_list.html'
+    context_object_name = 'posts'
+    paginate_by = 20
  
  
 class PostDetail(DetailView):
-    queryset = Post.objects.all()
+    model = Post
     template_name = 'core/post_detail.html'
     context_object_name = 'post'
 
@@ -37,12 +41,6 @@ class PostDetail(DetailView):
     
 
 
-
-
-# class NewPost(CreateView):
-#     model = Post
-#     fields = ['title','content', 'subject']
-#     template_name = 'core/new_post.html'
 
 
 # class NewPost(FormView):
@@ -72,6 +70,17 @@ class PostTableView(SingleTableView):
 class CommentTableView(SingleTableView):
     model = Comment
     template_name = 'core/comment_table.html'
-    # paginator_class = LazyPaginator
     table_class = CommentTable
     paginate_by = 5
+
+
+class UpdatePost(UpdateView, LoginRequiredMixin, UserPassesTestMixin):
+    model = Post
+    form_class = NewPostForm
+    template_name = 'core/edit_post.html'
+    success_url = reverse_lazy('post_table')
+
+
+class DeletePost(DeleteView, LoginRequiredMixin, UserPassesTestMixin):
+    model = Post
+    success_url = reverse_lazy('post_table')

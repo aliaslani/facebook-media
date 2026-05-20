@@ -1,0 +1,382 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+
+{% block title %}
+{{ user.username }} Profile
+{% endblock %}
+
+{% block main %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-10">
+
+            <!-- PROFILE HEADER -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+
+                <!-- Cover -->
+                <div class="bg-dark"
+                     style="
+                        height: 220px;
+                        background: linear-gradient(135deg, #0d6efd, #6610f2);
+                     ">
+                </div>
+
+                <!-- Profile Info -->
+                <div class="card-body position-relative px-4 pb-4">
+
+                    <!-- Avatar -->
+                    <div class="position-absolute"
+                         style="top: -70px; left: 40px;">
+
+                        <img src="{{ user.profile_picture.url }}"
+                             alt="{{ user.username }}"
+                             class="rounded-circle border border-4 border-white shadow"
+                             width="140"
+                             height="140"
+                             style="object-fit: cover;">
+                    </div>
+
+                    <!-- Edit Button -->
+                    <div class="text-end">
+
+                        {% if request.user == user %}
+                        <a href="{% url 'profile_update' user.pk %}"
+                           class="btn btn-outline-primary rounded-pill px-4">
+
+                            <i class="bi bi-pencil-square"></i>
+                            Edit Profile
+
+                        </a>
+                        {% endif %}
+
+                    </div>
+
+                    <!-- User Info -->
+                    <div class="mt-5 pt-4">
+
+                        <h2 class="fw-bold mb-1">
+                            {{ user.get_full_name|default:user.username }}
+                        </h2>
+
+                        <p class="text-muted mb-3 fs-5">
+                            @{{ user.username }}
+                        </p>
+
+                        <!-- Bio -->
+                        {% if user.bio %}
+                        <p class="text-secondary fs-6"
+                           style="line-height: 1.9; max-width: 800px;">
+
+                            {{ user.bio }}
+
+                        </p>
+                        {% endif %}
+
+                        <!-- Meta -->
+                        <div class="d-flex flex-wrap gap-4 mt-4">
+
+                            {% if user.city %}
+                            <div class="text-muted">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                {{ user.city }}
+                            </div>
+                            {% endif %}
+
+                            {% if user.phone %}
+                            <div class="text-muted">
+                                <i class="bi bi-telephone-fill"></i>
+                                {{ user.phone }}
+                            </div>
+                            {% endif %}
+
+                            <div class="text-muted">
+                                <i class="bi bi-calendar-event-fill"></i>
+                                Joined {{ user.date_joined|date:"F Y" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <!-- LEFT SIDEBAR -->
+                <div class="col-lg-4">
+
+                    <!-- SOCIAL LINKS -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold mb-4">
+                                Social Links
+                            </h5>
+
+                            {% if user.social_links.all %}
+
+                                <div class="d-grid gap-3">
+
+                                    {% for social in user.social_links.all %}
+
+                                    <a href="{{ social.url }}"
+                                       target="_blank"
+                                       class="text-decoration-none">
+
+                                        <div class="d-flex align-items-center justify-content-between
+                                                    bg-light rounded-4 px-3 py-3 social-box">
+
+                                            <div class="d-flex align-items-center">
+
+                                                <!-- ICONS -->
+                                                <div class="me-3">
+
+                                                    {% if social.platform == 'FB' %}
+                                                        <i class="bi bi-facebook text-primary fs-4"></i>
+
+                                                    {% elif social.platform == 'TW' %}
+                                                        <i class="bi bi-twitter-x fs-4"></i>
+
+                                                    {% elif social.platform == 'IG' %}
+                                                        <i class="bi bi-instagram text-danger fs-4"></i>
+
+                                                    {% elif social.platform == 'LI' %}
+                                                        <i class="bi bi-linkedin text-primary fs-4"></i>
+
+                                                    {% elif social.platform == 'GH' %}
+                                                        <i class="bi bi-github text-dark fs-4"></i>
+
+                                                    {% else %}
+                                                        <i class="bi bi-link-45deg fs-4"></i>
+                                                    {% endif %}
+
+                                                </div>
+
+                                                <div>
+                                                    <div class="fw-semibold text-dark">
+                                                        {{ social.get_platform_display }}
+                                                    </div>
+
+                                                    <small class="text-muted">
+                                                        Visit profile
+                                                    </small>
+                                                </div>
+
+                                            </div>
+
+                                            <i class="bi bi-box-arrow-up-right text-muted"></i>
+
+                                        </div>
+
+                                    </a>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            {% else %}
+
+                                <div class="text-center py-4">
+
+                                    <i class="bi bi-share display-5 text-muted"></i>
+
+                                    <p class="text-muted mt-3 mb-0">
+                                        No social links added yet.
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <!-- USER STATS -->
+                    <div class="card border-0 shadow-sm rounded-4">
+
+                        <div class="card-body">
+
+                            <h5 class="fw-bold mb-4">
+                                Statistics
+                            </h5>
+
+                            <div class="row text-center g-3">
+
+                                <div class="col-6">
+
+                                    <div class="bg-light rounded-4 p-3">
+
+                                        <h3 class="fw-bold text-primary mb-1">
+                                            {{ user.post_set.count }}
+                                        </h3>
+
+                                        <small class="text-muted">
+                                            Posts
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-6">
+
+                                    <div class="bg-light rounded-4 p-3">
+
+                                        <h3 class="fw-bold text-success mb-1">
+                                            {{ user.social_links.count }}
+                                        </h3>
+
+                                        <small class="text-muted">
+                                            Links
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- POSTS SECTION -->
+                <div class="col-lg-8">
+
+                    <div class="card border-0 shadow-sm rounded-4">
+
+                        <div class="card-body">
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                                <h4 class="fw-bold mb-0">
+                                    Recent Posts
+                                </h4>
+
+                                <span class="badge bg-primary rounded-pill px-3 py-2">
+                                    {{ user.post_set.count }} Posts
+                                </span>
+
+                            </div>
+
+                            {% for post in user.post_set.all %}
+
+                            <!-- POST ITEM -->
+                            <div class="border rounded-4 p-4 mb-4">
+
+                                <!-- Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+
+                                    <div>
+
+                                        <div class="mb-2">
+                                            <span class="badge bg-dark-subtle text-dark rounded-pill">
+                                                {{ post.get_subject_display }}
+                                            </span>
+                                        </div>
+
+                                        <h5 class="fw-bold mb-1">
+                                            {{ post.title }}
+                                        </h5>
+
+                                        <small class="text-muted">
+                                            {{ post.created_at|naturaltime }}
+                                        </small>
+
+                                    </div>
+
+                                    <a href="{% url 'post_detail' post.pk %}"
+                                       class="btn btn-sm btn-light rounded-pill">
+
+                                        View
+
+                                    </a>
+
+                                </div>
+
+                                <!-- Content -->
+                                <p class="text-secondary mb-3"
+                                   style="line-height: 1.8;">
+
+                                    {{ post.content|truncatewords:35 }}
+
+                                </p>
+
+                                <!-- Footer -->
+                                <div class="d-flex justify-content-between align-items-center">
+
+                                    <small class="text-muted">
+
+                                        <i class="bi bi-chat-dots"></i>
+                                        {{ post.comments.count }}
+                                        Comment{{ post.comments.count|pluralize }}
+
+                                    </small>
+
+                                    <a href="{% url 'post_detail' post.pk %}"
+                                       class="text-decoration-none fw-semibold">
+
+                                        Read More →
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                            {% empty %}
+
+                            <!-- EMPTY POSTS -->
+                            <div class="text-center py-5">
+
+                                <i class="bi bi-file-earmark-text display-4 text-muted"></i>
+
+                                <h5 class="fw-bold mt-3">
+                                    No Posts Yet
+                                </h5>
+
+                                <p class="text-muted">
+                                    This user has not shared anything yet.
+                                </p>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.social-box{
+    transition: all .2s ease;
+}
+
+.social-box:hover{
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+</style>
+
+{% endblock %}

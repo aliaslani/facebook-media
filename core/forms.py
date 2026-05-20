@@ -1,6 +1,6 @@
 from django.forms import Form, ModelForm
 from django import forms
-from core.models import Post, TaggedUser, Comment
+from core.models import Post, Comment
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Submit, Layout, Field
 
@@ -67,16 +67,6 @@ class NewPostForm(ModelForm):
         return cleaned_data
 
 
-
-class TaggedUserForm(ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag= False
-    class Meta:
-        model = TaggedUser
-        fields = ['user']
 
 
 class CommentForm(ModelForm):

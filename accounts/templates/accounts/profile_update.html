@@ -1,0 +1,69 @@
+{% extends 'core/base.html'%}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Update Profile{% endblock %}
+
+{% block main %}
+<div class="container mt-5">
+    <h2>Update Profile</h2>
+   {% load crispy_forms_tags %}
+
+<form method="post" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    <!-- Main User Form -->
+    {{ form|crispy }}
+
+    <hr>
+
+    <h3>Social Links</h3>
+
+    <!-- Management Form -->
+    {{ inlines.0.management_form }}
+
+    <div id="social-links">
+
+        {% for social_form in inlines.0.forms %}
+
+            <div class="social-form border p-3 mb-3">
+
+                {{ social_form|crispy }}
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- Hidden Empty Form -->
+    <div id="empty-form" class="d-none">
+
+        <div class="social-form border p-3 mb-3">
+            {{ inlines.0.empty_form|crispy }}
+        </div>
+
+    </div>
+
+    <!-- Add Button -->
+    <button
+        type="button"
+        class="btn btn-success mb-3"
+        id="add-social-link"
+    >
+        + Add Link
+    </button>
+
+    <br>
+
+    <button type="submit" class="btn btn-primary">
+        Save
+    </button>
+
+</form> 
+</div>
+{% endblock %}
+
+{% block extra %}
+    <script src="{% static 'js/main.js' %}"></script>
+{% endblock %}

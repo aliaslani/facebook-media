@@ -1,0 +1,28 @@
+{% extends 'accounts/base.html'%}
+
+{% load crispy_forms_tags %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Register</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        <h2 class="mt-4">Social Links</h2>
+        {{ inlines.0.management_form }}
+        {% for social_form in inlines.0.forms %}
+
+        <div style="border:1px solid #ccc;padding:10px;margin:10px 0;">
+
+            {{ social_form | crispy }}
+
+
+        </div>
+
+    {% endfor %}
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</div>
+{% endblock %}

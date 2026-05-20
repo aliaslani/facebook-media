@@ -1,75 +1,56 @@
-{% extends 'core/base.html' %}
-{% load crispy_forms_tags %}
-{% block title %}
-    {{ post.title }}
-{% endblock %}
-
-
-{% block main %}
+{% extends 'core/base.html' %} 
+{% load crispy_forms_tags %} 
+{% block title %} 
+{{ post.title }} 
+{% endblock %} {% block main %}
 
 <div class="row d-flex justify-content-between">
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-header">
-                {{ post.title}}
-            </div>
-            <div class="card-body">
-                <p>
-                    {{ post.content }}
-                </p>
-                <small>{{ post.created_at }} </small>  <small> {{ post.user }}</small>
-            </div>
-        </div>
-
-        <form hx-post="{% url 'post_detail' post.pk %}" hx-swap="afterbegin" method="post" class="mt-4">
-
-    {% csrf_token %}
-
-    {{ form|crispy }}
-    <input type='submit' value='Add Comment' class='btn btn-primary mt-3'>
-
-</form>
-        {% if post.comments.all %}
-        <div class="mt-5">
-
-    {% for comment in post.comments.all %}
-
-        <div class="card border-0 shadow-sm rounded-4 mb-3">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <strong>
-                        {{ comment.user.username }}
-                    </strong>
-
-                    <small class="text-muted">
-                        {{ comment.created_at|timesince }} ago
-                    </small>
-
-                </div>
-
-                <p class="mt-3 mb-0">
-                    {{ comment.body }}
-                </p>
-
-            </div>
-
-        </div>
-
-    {% empty %}
-
-        <p class="text-muted">
-            No comments yet.
-        </p>
-
-    {% endfor %}
-
-</div>
-        {% endif %}
-
-
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header">{{ post.title}}</div>
+      <div class="card-body">
+        <p>{{ post.content }}</p>
+        <small>{{ post.created_at }} </small> <small> {{ post.user }}</small>
+      </div>
     </div>
+
+    {% if post.comments.all %}
+    <div class="mt-5">
+      {% for comment in post.comments.all %}
+
+      <div class="card border-0 shadow-sm rounded-4 mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <strong> {{ comment.user.username }} </strong>
+
+            <small class="text-muted">
+              {{ comment.created_at|timesince }} ago
+            </small>
+          </div>
+
+          <p class="mt-3 mb-0">{{ comment.body }}</p>
+        </div>
+      </div>
+
+      {% empty %}
+
+      <p class="text-muted">No comments yet.</p>
+
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  {% if user.is_authenticated %}
+
+  <form
+    hx-post="{% url 'post_detail' post.pk %}"
+    hx-swap="afterbegin"
+    method="post"
+    class="mt-4"
+  >
+    {% csrf_token %} {{ form|crispy }}
+    <input type="submit" value="Add Comment" class="btn btn-primary mt-3" />
+  </form>
+  {% endif %}
 </div>
 {% endblock %}

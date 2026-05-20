@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import CustomUser
+from accounts.models import CustomUser, SocialLink
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -10,3 +10,10 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 
+
+class SocialLinkAdmin(admin.ModelAdmin):
+    list_display = ['user', 'platform', 'url']
+    search_fields = ['user__username', 'platform']
+    list_filter = ['platform']
+
+admin.site.register(SocialLink, SocialLinkAdmin)

@@ -38,10 +38,3 @@ class Comment(models.Model):
         ordering = ['-created_at']
     
 
-
-
-
-class TaggedUser(models.Model):
-    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='tagged_users')
-    user = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE)
-
