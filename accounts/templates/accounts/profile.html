@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 {% load humanize %}
-
+{%  load jalali_tags %}
 {% block title %}
 {{ user.username }} Profile
 {% endblock %}
@@ -94,7 +94,7 @@
 
                             <div class="text-muted">
                                 <i class="bi bi-calendar-event-fill"></i>
-                                Joined {{ user.date_joined|date:"F Y" }}
+                                Joined {{ user.date_joined|jalali }}
                             </div>
 
                         </div>

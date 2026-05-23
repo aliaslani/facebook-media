@@ -1,5 +1,6 @@
 import django_tables2 as tables
 from core.models import Post, Comment
+import jdatetime
 
 class PostTable(tables.Table):
 
@@ -8,11 +9,16 @@ class PostTable(tables.Table):
     class Meta:
         model = Post
         template_name = 'django_tables2/bootstrap5.html'
-        fields = ('title', 'content', 'subject')
+        fields = ('title', 'content', 'subject', 'created_at')
         
 
     def render_content(self, value):
         return value[:10] + '...' if len(value) > 10 else value
+
+    def render_created_at(self, value):
+        return jdatetime.datetime.fromgregorian(
+            datetime=value
+        ).strftime('%Y-%m-%d %H:%M:%S')
 
 class CommentTable(tables.Table):
 

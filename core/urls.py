@@ -1,5 +1,8 @@
 from django.urls import path
-from core.views import PostListView, PostDetail, NewPost,PostTableView, CommentTableView, UpdatePost, DeletePost
+from django.views.generic import TemplateView
+
+from core.views import PostListView, PostDetail, NewPost,PostTableView, CommentTableView, UpdatePost, DeletePost,\
+    LineChartJSONView
 
 urlpatterns = [
     path('', PostListView.as_view(), name='post_list'),
@@ -9,6 +12,8 @@ urlpatterns = [
     path('comments/table/', CommentTableView.as_view(), name='comment_table'),
     path('post/<int:pk>/update/', UpdatePost.as_view(), name='update_post'),
     path('post/<int:pk>/delete/', DeletePost.as_view(), name='delete_post'),
+    path('chart/', TemplateView.as_view(template_name='core/charts.html'), name='chart'),
+    path('chartJSON/', LineChartJSONView.as_view(), name='line_chart_json'),
 
 ]
 

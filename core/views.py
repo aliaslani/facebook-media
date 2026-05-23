@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from core.filters import PostFilter
 from core.models import Post, Comment
 from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView, DeleteView
 from core.forms import NewPostForm, CommentForm, Comment
@@ -8,12 +10,28 @@ from core.tables import CommentTable
 from django.db.models import Count
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-class PostListView(ListView):
+from django_filters.views import FilterView
+from core.filters import PostFilter
+from django.views.generic import TemplateView
+from chartjs.views.lines import BaseLineChartView
+from accounts.models import CustomUser
+from django.db.models import Count
+
+
+# class PostListView(ListView):
+#     model = Post
+#     template_name = 'core/post_list.html'
+#     context_object_name = 'posts'
+#     paginate_by = 20
+
+
+class PostListView(FilterView):
     model = Post
     template_name = 'core/post_list.html'
+    filterset_class = PostFilter
     context_object_name = 'posts'
-    paginate_by = 20
- 
+    paginate_by = 5
+
  
 class PostDetail(DetailView):
     model = Post
@@ -52,7 +70,7 @@ class NewPost(CreateView):
     model = Post
     form_class = NewPostForm
     template_name = 'core/new_post.html'
-    success_url = '/posts/post/table/'
+    success_url = reverse_lazy('post_table')
 
     def form_valid(self, form):
 
@@ -84,3 +102,13 @@ class UpdatePost(UpdateView, LoginRequiredMixin, UserPassesTestMixin):
 class DeletePost(DeleteView, LoginRequiredMixin, UserPassesTestMixin):
     model = Post
     success_url = reverse_lazy('post_table')
+
+
+class LineChartJSONView(BaseLineChartView):
+    def get_labels(self):
+        return list(CustomUser.objects.values_list('username', flat=True))
+
+    def get_data(self):
+        qs = CustomUser.objects.annotate(post_count=Count('posts'))
+        return [[u.post_count for u in qs ]]
+

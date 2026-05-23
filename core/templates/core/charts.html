@@ -1,0 +1,24 @@
+{%  extends 'core/base.html' %}
+{% load static %}
+
+{%  block title %} Charts {%  endblock %}
+{%  block main %}
+        <h1>Some Line Charts loaded in Ajax!</h1>
+
+        <canvas id="myChart" width="500" height="400"></canvas>
+
+{%  endblock %}
+
+{%  block extra %}
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script type="text/javascript">
+            $.get('{% url "line_chart_json" %}', function(data) {
+                console.log(data);
+                var ctx = $("#myChart").get(0).getContext("2d");
+                new Chart(ctx, {
+                    type: 'line', data: data
+                });
+            });
+        </script>
+{% endblock %}

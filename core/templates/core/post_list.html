@@ -1,5 +1,7 @@
-{% extends 'core/base.html' %} 
-{% load humanize %} 
+{% extends 'core/base.html' %}
+{%  load crispy_forms_tags %}
+{% load humanize %}
+{%  load jalali_tags %}
 {% block title %} Posts {% endblock %} 
 {% block main %}
 
@@ -31,6 +33,11 @@
 
   <div class="row justify-content-center">
     <div class="col-lg-8">
+    <form method="get">
+        {{ filter.form|crispy }}
+        <input type="submit" class="btn btn-primary" value="Search" >
+    </form>
+    <hr>
       {% for post in posts %}
 
       <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
@@ -50,7 +57,7 @@
                 <h6 class="mb-0 fw-bold">{{ post.user.username }}</h6>
 
                 <small class="text-muted">
-                  {{ post.created_at|naturaltime }}
+                  {{ post.created_at|jalali_datetime|naturaltime }}
                 </small>
               </div>
             </div>
@@ -126,7 +133,7 @@
 
           {% if post.created_at != post.last_update %}
           <small class="text-muted">
-            Edited {{ post.last_update|naturaltime }}
+            Edited {{ post.last_update|jalali_datetime|naturaltime }}
           </small>
           {% endif %}
         </div>
@@ -189,7 +196,7 @@
                   <strong class="small"> {{ comment.user.username }} </strong>
 
                   <small class="text-muted">
-                    {{ comment.created_at|naturaltime }}
+                    {{ comment.created_at|jalali_datetime|naturaltime }}
                   </small>
                 </div>
 
@@ -222,7 +229,7 @@
           <p class="text-muted">Be the first person to create a post.</p>
 
           <a
-            href="{% url 'post_create' %}"
+            href="{% url 'new_post' %}"
             class="btn btn-primary rounded-pill px-4"
           >
             Create First Post

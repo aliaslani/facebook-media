@@ -68,6 +68,15 @@
                     </li>
 
                     <li class="nav-item">
+                    <a
+                        class="nav-link {%  if request.resolver_match.url_name == 'chart' %}active{% endif %}"
+                        href="{% url 'chart' %}"
+                        >
+                        Charts
+                    </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a
                             class="nav-link {% if request.resolver_match.url_name == 'new_post' %}active{% endif %}"
                             href="{% url 'new_post' %}"
