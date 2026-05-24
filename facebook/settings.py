@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
+from datetime import datetime
+from datetime import timezone
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone as tz
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_jalali',
     'chartjs',
+    'slick_reporting',
 ]
 
 MIDDLEWARE = [
@@ -133,4 +137,83 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+# SLICK_REPORTING_SETTINGS = {
+#
+#     "JQUERY_URL": "https://code.jquery.com/jquery-3.7.0.min.js",
+#
+#     "DEFAULT_START_DATE_TIME": datetime(
+#         tz.now().year,
+#         1,
+#         1,
+#         0,
+#         0,
+#         0,
+#         tzinfo=timezone.utc
+#     ),
+#
+#     "DEFAULT_END_DATE_TIME": tz.now(),
+#     "DEFAULT_CHARTS_ENGINE": 'chartsjs',
+#
+#     "MEDIA": {
+#
+#         "override": False,
+#
+#         "js": (
+#
+#             "https://cdn.jsdelivr.net/momentjs/latest/moment.min.js",
+#
+#             "https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js",
+#
+#             "https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js",
+#
+#             "slick_reporting/slick_reporting.js",
+#
+#             "slick_reporting/slick_reporting.report_loader.js",
+#
+#             "slick_reporting/slick_reporting.datatable.js",
+#         ),
+#
+#         "css": {
+#
+#             "all": (
+#
+#                 "https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css",
+#
+#             ),
+#         },
+#     },
+#
+#     "FONT_AWESOME": {
+#
+#         "CSS_URL": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css",
+#
+#         "ICONS": {
+#
+#             "pie": "fas fa-chart-pie",
+#
+#             "bar": "fas fa-chart-bar",
+#
+#             "line": "fas fa-chart-line",
+#
+#             "area": "fas fa-chart-area",
+#
+#             "column": "fas fa-cahrt-bar",
+#         },
+#     },
 
+#     "CHARTS": {
+#
+#         "highcharts": "$.slick_reporting.highcharts.displayChart",
+#
+#         "chartjs": "$.slick_reporting.chartjs.displayChart",
+#     },
+#
+# "MESSAGES": {
+#     "total": "Total",
+#     "export_to_csv": "Export CSV",
+#     "print_report": "Print Report",
+# },
+# }
+SLICK_REPORTING_SETTINGS = {
+    "JQUERY_URL": "https://code.jquery.com/jquery-3.7.0.min.js",
+}

@@ -1,10 +1,12 @@
+from itertools import count
+
 from django.shortcuts import render
 
 from core.filters import PostFilter
 from core.models import Post, Comment
 from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView, DeleteView
 from core.forms import NewPostForm, CommentForm, Comment
-from django_tables2 import SingleTableView
+from django_tables2 import SingleTableView, SingleTableMixin
 from core.tables import PostTable
 from core.tables import CommentTable
 from django.db.models import Count
@@ -14,8 +16,15 @@ from django_filters.views import FilterView
 from core.filters import PostFilter
 from django.views.generic import TemplateView
 from chartjs.views.lines import BaseLineChartView
+from chartjs.views.columns import BaseColumnsHighChartsView
+from chartjs.views.pie import HighChartPieView
 from accounts.models import CustomUser
 from django.db.models import Count
+from core.filters import PostFilter
+from slick_reporting.views import ReportView, Chart
+from slick_reporting.fields import ComputationField
+
+
 
 
 # class PostListView(ListView):
@@ -78,10 +87,11 @@ class NewPost(CreateView):
         return super().form_valid(form)
 
 
-class PostTableView(SingleTableView):
+class PostTableView(SingleTableMixin, FilterView):
     model = Post
     queryset = Post.objects.annotate(comments_count=Count('comments'))
     table_class = PostTable
+    filterset_class = PostFilter
     template_name = 'core/post_table.html'
 
     
@@ -104,7 +114,7 @@ class DeletePost(DeleteView, LoginRequiredMixin, UserPassesTestMixin):
     success_url = reverse_lazy('post_table')
 
 
-class LineChartJSONView(BaseLineChartView):
+class BarChartView(BaseColumnsHighChartsView):
     def get_labels(self):
         return list(CustomUser.objects.values_list('username', flat=True))
 
@@ -112,3 +122,38 @@ class LineChartJSONView(BaseLineChartView):
         qs = CustomUser.objects.annotate(post_count=Count('posts'))
         return [[u.post_count for u in qs ]]
 
+
+
+class PieChartView(HighChartPieView):
+    def get_labels(self):
+        return list(CustomUser.objects.values_list('username', flat=True))
+    def get_data(self):
+        qs = CustomUser.objects.annotate(post_count=Count('posts'))
+        return [[u.post_count for u in qs]]
+
+
+class PostSubmit(ReportView):
+    report_model = Post
+    date_field = 'created_at'
+    group_by = 'user'
+
+    columns = [
+        'username',
+        ComputationField.create(
+            method=Count, field="title", name="title__count", verbose_name="Number of posts"
+        ),
+    ]
+    chart_settings = [
+        Chart(
+            "Number of posts",
+            Chart.BAR,
+            data_source=['count__title'],
+            title_source=['user']
+        ),
+        Chart(
+            "Number of comments [PIE]",
+            Chart.PIE,
+            data_source=['count__title'],
+            title_source=['user']
+        )
+    ]

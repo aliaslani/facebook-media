@@ -12,13 +12,16 @@
 {%  block extra %}
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
         <script type="text/javascript">
-            $.get('{% url "line_chart_json" %}', function(data) {
-                console.log(data);
-                var ctx = $("#myChart").get(0).getContext("2d");
-                new Chart(ctx, {
-                    type: 'line', data: data
-                });
-            });
+            $.get('{% url "pie_chart_json" %}', function(data) {
+
+    var ctx = $("#myChart")[0].getContext("2d");
+
+    new Chart(ctx, {
+        type: 'bar',   // ✅ changed from 'line'
+        data: data
+    });
+});
         </script>
 {% endblock %}

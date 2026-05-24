@@ -2,7 +2,7 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from core.views import PostListView, PostDetail, NewPost,PostTableView, CommentTableView, UpdatePost, DeletePost,\
-    LineChartJSONView
+    BarChartView, PieChartView, PostSubmit
 
 urlpatterns = [
     path('', PostListView.as_view(), name='post_list'),
@@ -13,7 +13,10 @@ urlpatterns = [
     path('post/<int:pk>/update/', UpdatePost.as_view(), name='update_post'),
     path('post/<int:pk>/delete/', DeletePost.as_view(), name='delete_post'),
     path('chart/', TemplateView.as_view(template_name='core/charts.html'), name='chart'),
-    path('chartJSON/', LineChartJSONView.as_view(), name='line_chart_json'),
+    path('chartJSON/', BarChartView.as_view(), name='bar_chart_json'),
+    path('piechart/', PieChartView.as_view(), name='pie_chart_json'),
+    path('piechart/', PieChartView.as_view(), name='pie_chart_json'),
+    path('postsubmit/', PostSubmit.as_view(), name='post_submit'),
 
 ]
 
