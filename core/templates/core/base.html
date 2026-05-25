@@ -7,10 +7,11 @@
     <title>
         {% block title %}   {% endblock %}
     </title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
 
     <div class="container">
 
@@ -21,13 +22,13 @@
 
         <!-- Mobile Toggle -->
         <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#mainNavbar"
-            aria-controls="mainNavbar"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
         >
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -40,8 +41,8 @@
 
                 <li class="nav-item">
                     <a
-                        class="nav-link {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}"
-                        href="{% url 'post_list' %}"
+                            class="nav-link {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}"
+                            href="{% url 'post_list' %}"
                     >
                         Home
                     </a>
@@ -51,8 +52,8 @@
 
                     <li class="nav-item">
                         <a
-                            class="nav-link {% if request.resolver_match.url_name == 'post_table' %}active{% endif %}"
-                            href="{% url 'post_table' %}"
+                                class="nav-link {% if request.resolver_match.url_name == 'post_table' %}active{% endif %}"
+                                href="{% url 'post_table' %}"
                         >
                             Posts
                         </a>
@@ -60,26 +61,39 @@
 
                     <li class="nav-item">
                         <a
-                            class="nav-link {% if request.resolver_match.url_name == 'comment_table' %}active{% endif %}"
-                            href="{% url 'comment_table' %}"
+                                class="nav-link {% if request.resolver_match.url_name == 'comment_table' %}active{% endif %}"
+                                href="{% url 'comment_table' %}"
                         >
                             Comments
                         </a>
                     </li>
 
                     <li class="nav-item">
-                    <a
-                        class="nav-link {%  if request.resolver_match.url_name == 'chart' %}active{% endif %}"
-                        href="{% url 'chart' %}"
+                        <a
+                                class="nav-link {% if request.resolver_match.url_name == 'chart' %}active{% endif %}"
+                                href="{% url 'chart' %}"
                         >
-                        Charts
-                    </a>
+                            Charts
+                        </a>
                     </li>
 
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'post_monthly_report' %}"> Monthly Posts Report
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'post_submit' %}"> User Posts Report
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'total-product-sales' %}"> Total Sales
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a
-                            class="nav-link {% if request.resolver_match.url_name == 'new_post' %}active{% endif %}"
-                            href="{% url 'new_post' %}"
+                                class="nav-link {% if request.resolver_match.url_name == 'new_post' %}active{% endif %}"
+                                href="{% url 'new_post' %}"
                         >
                             Create Post
                         </a>
@@ -98,21 +112,21 @@
                     <li class="nav-item dropdown">
 
                         <a
-                            class="nav-link dropdown-toggle d-flex align-items-center gap-2"
-                            href="#"
-                            role="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
+                                class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                                href="#"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
                         >
 
                             {% if request.user.profile_picture %}
                                 <img
-                                    src="{{ request.user.profile_picture.url }}"
-                                    alt="Profile"
-                                    class="rounded-circle"
-                                    width="32"
-                                    height="32"
-                                    style="object-fit: cover;"
+                                        src="{{ request.user.profile_picture.url }}"
+                                        alt="Profile"
+                                        class="rounded-circle"
+                                        width="32"
+                                        height="32"
+                                        style="object-fit: cover;"
                                 >
                             {% endif %}
 
@@ -126,8 +140,8 @@
 
                             <li>
                                 <a
-                                    class="dropdown-item"
-                                    href="{% url 'profile' request.user.pk %}"
+                                        class="dropdown-item"
+                                        href="{% url 'profile' request.user.pk %}"
                                 >
                                     Profile
                                 </a>
@@ -135,8 +149,8 @@
 
                             <li>
                                 <a
-                                    class="dropdown-item"
-                                    href="{% url 'profile_update' request.user.pk %}"
+                                        class="dropdown-item"
+                                        href="{% url 'profile_update' request.user.pk %}"
                                 >
                                     Edit Profile
                                 </a>
@@ -149,14 +163,14 @@
                             <li>
 
                                 <form
-                                    method="post"
-                                    action="{% url 'logout' %}"
+                                        method="post"
+                                        action="{% url 'logout' %}"
                                 >
                                     {% csrf_token %}
 
                                     <button
-                                        type="submit"
-                                        class="dropdown-item text-danger"
+                                            type="submit"
+                                            class="dropdown-item text-danger"
                                     >
                                         Logout
                                     </button>
@@ -174,8 +188,8 @@
                     <!-- Guest Buttons -->
                     <li class="nav-item me-2">
                         <a
-                            class="btn btn-outline-light"
-                            href="{% url 'login' %}"
+                                class="btn btn-outline-light"
+                                href="{% url 'login' %}"
                         >
                             Login
                         </a>
@@ -183,8 +197,8 @@
 
                     <li class="nav-item">
                         <a
-                            class="btn btn-primary"
-                            href="{% url 'register' %}"
+                                class="btn btn-primary"
+                                href="{% url 'register' %}"
                         >
                             Register
                         </a>
@@ -207,9 +221,11 @@
 
 
     {% endblock %}
-        </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-        {% block extra %}
-        {% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+{% block extra %}
+{% endblock %}
 </body>
 </html>

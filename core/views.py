@@ -131,29 +131,77 @@ class PieChartView(HighChartPieView):
         qs = CustomUser.objects.annotate(post_count=Count('posts'))
         return [[u.post_count for u in qs]]
 
-
+class TotalNumberPostField(ComputationField):
+    calculation_method = Count
+    calculation_field = "id"
+    verbose_name = "Total number of posts"
+    name = "total_count"
 class PostSubmit(ReportView):
+    template_name = "core/post_per_user_chart.html"
     report_model = Post
-    date_field = 'created_at'
-    group_by = 'user'
-
+    date_field = "created_at"
+    group_by = "user__username"
+    # crosstab_field = "subject"
+    # crosstab_columns = [
+    #     TotalNumberPostField,
+    # ]
+    # crosstab_ids = ["social","sport"]
+    # crosstab_compute_remainder = True
+    # template_name = "core/post_per_user_chart.html"
     columns = [
-        'username',
+        "user__username",
+
+
         ComputationField.create(
-            method=Count, field="title", name="title__count", verbose_name="Number of posts"
-        ),
+            Count,
+            "id",
+            name="subject_count",
+            verbose_name="Number of posts",
+        )
     ]
     chart_settings = [
         Chart(
             "Number of posts",
-            Chart.BAR,
-            data_source=['count__title'],
-            title_source=['user']
-        ),
-        Chart(
-            "Number of comments [PIE]",
-            Chart.PIE,
-            data_source=['count__title'],
-            title_source=['user']
+            Chart.COLUMN,
+            data_source=["subject_count"],
+            title_source=["user__username"]
         )
     ]
+
+
+
+class PostMonthlyReportView(ReportView):
+    template_name = 'core/post_per_month_chart.html'
+    report_model = Post
+    date_field = "created_at"
+    group_by = "user__username"
+    time_series_pattern = "monthly"
+    time_series_columns = [
+        TotalNumberPostField,
+    ]
+
+    columns = [
+        "user__username",
+
+    ComputationField.create(
+            Count,
+            "id",
+            name="post_count",
+            verbose_name="Number of posts",
+        )
+    ]
+    chart_settings = [
+        Chart(
+            "Post Per Month",
+            Chart.BAR,
+            data_source=["total_count"],
+            title_source=["user__username"],
+        ),
+        Chart(
+            "Post Monthly [Bar]",
+            Chart.COLUMN,
+            data_source=["total_count"],
+            title_source=["user__username"],
+        )
+    ]
+

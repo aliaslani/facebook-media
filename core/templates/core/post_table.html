@@ -1,49 +1,49 @@
-{% extends 'core/base.html'%}
-{% load django_tables2%}
-{%  load crispy_forms_tags %}
+{% extends 'core/base.html' %}
+{% load django_tables2 %}
+{% load crispy_forms_tags %}
 {% block title %}
 {% endblock %}
 
 {% block main %}
-<div class="row d-flex justify-content-between">
-<form method="get" class="row g-2 align-items-end mb-4">
+    <div class="row d-flex justify-content-between">
+        <form method="get" class="row g-2 align-items-end mb-4">
 
-    <div class="col-md-3">
-        <label class="form-label">{{ filter.form.title.label }}</label>
-        {{ filter.form.title }}
-    </div>
-
-    <div class="col-md-2">
-        <label class="form-label">{{ filter.form.created_at_from.label }}</label>
-        {{ filter.form.created_at_from }}
-    </div>
-
-    <div class="col-md-2">
-        <label class="form-label">{{ filter.form.created_at_to.label }}</label>
-        {{ filter.form.created_at_to }}
-    </div>
-
-    <div class="col-md-3">
-        <label class="form-label">{{ filter.form.content.label }}</label>
-        {{ filter.form.content }}
-    </div>
-
-    <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">
-            Filter
-        </button>
-    </div>
-
-</form>
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header">
-                Posts
+            <div class="col-md-3">
+                <label class="form-label">{{ filter.form.title.label }}</label>
+                {{ filter.form.title }}
             </div>
-            <div class="card-body">
-                {% render_table table %}    
+
+            <div class="col-md-2">
+                <label class="form-label">{{ filter.form.created_at_from.label }}</label>
+                {{ filter.form.created_at_from }}
             </div>
-        </div>  
+
+            <div class="col-md-2">
+                <label class="form-label">{{ filter.form.created_at_to.label }}</label>
+                {{ filter.form.created_at_to }}
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">{{ filter.form.content.label }}</label>
+                {{ filter.form.content }}
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    Filter
+                </button>
+            </div>
+
+        </form>
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    Posts
+                </div>
+                <div class="card-body">
+                    {% render_table table %}
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 {% endblock %}

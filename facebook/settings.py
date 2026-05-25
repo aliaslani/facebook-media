@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_jalali',
     'chartjs',
     'slick_reporting',
+    'market',
 ]
 
 MIDDLEWARE = [

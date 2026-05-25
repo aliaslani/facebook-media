@@ -2,7 +2,7 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from core.views import PostListView, PostDetail, NewPost,PostTableView, CommentTableView, UpdatePost, DeletePost,\
-    BarChartView, PieChartView, PostSubmit
+    BarChartView, PieChartView, PostSubmit, PostMonthlyReportView
 
 urlpatterns = [
     path('', PostListView.as_view(), name='post_list'),
@@ -17,6 +17,11 @@ urlpatterns = [
     path('piechart/', PieChartView.as_view(), name='pie_chart_json'),
     path('piechart/', PieChartView.as_view(), name='pie_chart_json'),
     path('postsubmit/', PostSubmit.as_view(), name='post_submit'),
+path(
+    "reports/posts/monthly/",
+    PostMonthlyReportView.as_view(),
+    name="post_monthly_report"
+)
 
 ]
 
