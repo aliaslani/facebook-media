@@ -159,6 +159,7 @@ class PostSubmit(ReportView):
             verbose_name="Number of posts",
         )
     ]
+
     chart_settings = [
         Chart(
             "Number of posts",

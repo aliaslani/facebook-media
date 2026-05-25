@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from django.db.models import Count, Sum
 from slick_reporting.views import ReportView, Chart, ListReportView
 from slick_reporting.fields import ComputationField
-from market.models import Product, Sales
+from market.models import  Sales
 
 
 class TotalProductSales(ReportView):
@@ -121,4 +120,5 @@ class LastTenSales(ListReportView):
         "value",
     ]
     default_order_by = "-doc_date"
-    limit_records = 10
+    limit_records = 11
+
