@@ -52,6 +52,12 @@ INSTALLED_APPS = [
     'slick_reporting',
     'market',
     "django_select2",
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_hotp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_email',
+    'django_huey',
 ]
 
 MIDDLEWARE = [
@@ -60,6 +66,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -227,4 +234,26 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # }
 SLICK_REPORTING_SETTINGS = {
     "JQUERY_URL": "https://code.jquery.com/jquery-3.7.0.min.js",
+}
+
+DJANGO_HUEY = {
+    'default': 'first', #this name must match with any of the queues defined below.
+    'queues': {
+        'first': {#this name will be used in decorators below
+            'huey_class': 'huey.RedisHuey',
+            'name': 'first_tasks',
+            'consumer': {
+                'workers': 2,
+                'worker_type': 'thread',
+            },
+        },
+        'emails': {#this name will be used in decorators below
+            'huey_class': 'huey.RedisHuey',
+            'name': 'emails_tasks',
+            'consumer': {
+                'workers': 5,
+                'worker_type': 'thread',
+            },
+        }
+    }
 }

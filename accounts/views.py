@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from django.views.generic import CreateView, FormView, DetailView
+from django.views.generic import CreateView, FormView, DetailView, TemplateView
 from accounts.forms import RegisterForm, SocialLinkForm, UserUpdateForm
 from accounts.models import CustomUser, SocialLink
 from extra_views import UpdateWithInlinesView, InlineFormSetFactory, CreateWithInlinesView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
-
-
+from django_otp.plugins.otp_totp.models import TOTPDevice
+import qrcode
+from PIL.Image import Image
 class SocialLinkInline(InlineFormSetFactory):
     model = SocialLink
     form_class = SocialLinkForm
@@ -49,6 +50,20 @@ class ProfileUpdateView(UpdateWithInlinesView):
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     success_url = reverse_lazy('post_table')
+
+def login_view(request):
+    device = TOTPDevice.objects.create(
+        user=request.user,
+        name='my phone',
+        confirmed=True,
+    )
+    config_url = device.config_url
+    image = qrcode.make(config_url)
+
+    if request.method == 'POST':
+        pass
+    return render(request, 'accounts/otp_login.html', {'device': device, 'config_url': config_url, 'img': image})
+
 
 
     def get_success_url(self):

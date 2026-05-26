@@ -24,6 +24,7 @@ from core.filters import PostFilter
 from slick_reporting.views import ReportView, Chart
 from slick_reporting.fields import ComputationField
 from braces.views import RecentLoginRequiredMixin
+from braces.views import FormInvalidMessageMixin
 
 
 
@@ -41,7 +42,7 @@ class PostListView(RecentLoginRequiredMixin, FilterView):
     filterset_class = PostFilter
     context_object_name = 'posts'
     paginate_by = 5
-    max_last_login_delta = 6000
+    max_last_login_delta = 600000
     raise_exception = True
 
  
@@ -78,11 +79,13 @@ class PostDetail(DetailView):
 #     template_name = 'core/new_post.html'
 #     success_url = '/posts/'
 
-class NewPost(CreateView):
+class NewPost(FormInvalidMessageMixin, CreateView):
     model = Post
     form_class = NewPostForm
     template_name = 'core/new_post.html'
     success_url = reverse_lazy('post_table')
+    form_invalid_message = "Oops, something went wrong."
+
 
     def form_valid(self, form):
 

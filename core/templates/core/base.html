@@ -216,6 +216,14 @@
 </nav>
 
 <div class="container py-4">
+{%  if messages %}
+    {% for message in messages %}
+        <div class="position-relative">
+        <div class="position-absolute w-100 alert alert-danger alert-dismissible fade show"><strong>{{ message }} </strong><button class="btn-close" data-bs-dismiss="alert"></button></div>
+        </div>
+    {% endfor %}
+{% endif %}
+    
     {% block main %}
 
 
