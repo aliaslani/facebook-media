@@ -1,8 +1,11 @@
 from django.forms import Form, ModelForm
 from django import forms
+
+from accounts.models import CustomUser
 from core.models import Post, Comment
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Submit, Layout, Field
+from django_select2 import forms as s2forms
 
 class NewPostForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -69,15 +72,34 @@ class NewPostForm(ModelForm):
 
 
 
-class CommentForm(ModelForm):
+# class CommentForm(ModelForm):
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, kwargs)
+#         self.helper = FormHelper()
+#         self.helper.form_tag= False
+#     class Meta:
+#         model = Comment
+#         fields = ['body']
+#         widgets = {
+#             'body': forms.Textarea(attrs={'class':'form-control', 'cols':30, 'rows':4}),
+#         }
+class UserWidget(s2forms.ModelSelect2Widget):
+    model = CustomUser
+    search_fields = [
+        "username__icontains",
+        "email__icontains",
+    ]
 
+class CommentForm(ModelForm):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, kwargs)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_tag= False
+        self.helper.form_tag = False
     class Meta:
         model = Comment
-        fields = ['body']
+        fields = ["user", "body"]
         widgets = {
+            'user': UserWidget(),
             'body': forms.Textarea(attrs={'class':'form-control', 'cols':30, 'rows':4}),
         }

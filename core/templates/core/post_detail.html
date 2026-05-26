@@ -2,7 +2,11 @@
 {% load crispy_forms_tags %}
 {% block title %}
     {{ post.title }}
-{% endblock %} {% block main %}
+    {%  endblock %}
+    {% block extra_css %}
+        {{  form.media.css }}
+        {% endblock %}
+{% block main %}
 
     <div class="row d-flex justify-content-between">
         <div class="col-sm-6">
@@ -51,6 +55,17 @@
                 {% csrf_token %} {{ form|crispy }}
                 <input type="submit" value="Add Comment" class="btn btn-primary mt-3"/>
             </form>
+{#            <form method="post" action="{% url 'post_detail' post.pk %}">#}
+{#            {% csrf_token %}#}
+{#            {{ form | crispy }}#}
+{#            <input type="submit" value="Add Comment" class="btn btn-primary mt-3">#}
+{#            </form>#}
         {% endif %}
     </div>
+{% endblock %}
+
+{% block extra %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    {{ form.media.js }}
+
 {% endblock %}

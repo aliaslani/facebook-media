@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),
     path("market/", include("market.urls")),
+    path("select2/", include("django_select2.urls")),
 ]
 
 
