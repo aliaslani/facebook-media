@@ -23,6 +23,7 @@ from django.db.models import Count
 from core.filters import PostFilter
 from slick_reporting.views import ReportView, Chart
 from slick_reporting.fields import ComputationField
+from braces.views import RecentLoginRequiredMixin
 
 
 
@@ -34,12 +35,14 @@ from slick_reporting.fields import ComputationField
 #     paginate_by = 20
 
 
-class PostListView(FilterView):
+class PostListView(RecentLoginRequiredMixin, FilterView):
     model = Post
     template_name = 'core/post_list.html'
     filterset_class = PostFilter
     context_object_name = 'posts'
     paginate_by = 5
+    max_last_login_delta = 6000
+    raise_exception = True
 
  
 class PostDetail(DetailView):
