@@ -1,6 +1,8 @@
 from itertools import count
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.core.paginator import Paginator
+
 
 from core.filters import PostFilter
 from core.models import Post, Comment
@@ -25,8 +27,8 @@ from slick_reporting.views import ReportView, Chart
 from slick_reporting.fields import ComputationField
 from braces.views import RecentLoginRequiredMixin
 from braces.views import FormInvalidMessageMixin
-
-
+from django_ratelimit.decorators import  ratelimit
+from django.utils.decorators import method_decorator
 
 
 # class PostListView(ListView):
@@ -34,15 +36,20 @@ from braces.views import FormInvalidMessageMixin
 #     template_name = 'core/post_list.html'
 #     context_object_name = 'posts'
 #     paginate_by = 20
-
-
+def ratelimited_error(request, exception=None):
+    return render(
+        request,
+        "core/429.html",
+        status=429,
+    )
+@method_decorator(ratelimit(key='ip', rate='5/m', block=True), name='dispatch')
 class PostListView(RecentLoginRequiredMixin, FilterView):
     model = Post
     template_name = 'core/post_list.html'
     filterset_class = PostFilter
     context_object_name = 'posts'
     paginate_by = 5
-    max_last_login_delta = 600000
+    max_last_login_delta = 600000000
     raise_exception = True
 
  
@@ -91,7 +98,6 @@ class NewPost(FormInvalidMessageMixin, CreateView):
 
         form.instance.user = self.request.user
         return super().form_valid(form)
-
 
 class PostTableView(SingleTableMixin, FilterView):
     model = Post
@@ -211,4 +217,5 @@ class PostMonthlyReportView(ReportView):
             title_source=["user__username"],
         )
     ]
+
 

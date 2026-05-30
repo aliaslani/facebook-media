@@ -7,7 +7,7 @@ class CustomUser(AbstractUser):
     phone = models.CharField(max_length=11)
     bio = models.CharField(max_length=1024)
     city = models.CharField(max_length=64)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', default='avatar.png')
+    profile_picture = models.ImageField(upload_to='profile_pictures/', default='profile_pictures/avatar.png')
 
     class Meta:
         verbose_name = 'کاربر'

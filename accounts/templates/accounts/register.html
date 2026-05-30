@@ -1,28 +1,84 @@
-{% extends 'accounts/base.html'%}
-
+{% extends "accounts/base.html" %}
 {% load crispy_forms_tags %}
+
 {% block title %}Register{% endblock %}
 
-{% block content %}
-<div class="container mt-5">
-    <h2>Register</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
+{% block main %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
 
-        <h2 class="mt-4">Social Links</h2>
-        {{ inlines.0.management_form }}
-        {% for social_form in inlines.0.forms %}
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
 
-        <div style="border:1px solid #ccc;padding:10px;margin:10px 0;">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Create Account</h2>
+                        <p class="text-muted mb-0">
+                            Fill out the form below to register your account
+                        </p>
+                    </div>
 
-            {{ social_form | crispy }}
+                    <form method="post" novalidate>
+                        {% csrf_token %}
 
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        {{ form|crispy }}
+
+                        <hr class="my-4">
+
+                        <div class="mb-3">
+                            <h4 class="fw-semibold mb-1">
+                                Social Links
+                            </h4>
+                            <p class="text-muted small mb-0">
+                                Add your social media profiles (optional)
+                            </p>
+                        </div>
+
+                        {{ inlines.0.management_form }}
+
+                        {% if inlines.0.non_form_errors %}
+                            <div class="alert alert-danger">
+                                {{ inlines.0.non_form_errors }}
+                            </div>
+                        {% endif %}
+
+                        {% for social_form in inlines.0.forms %}
+                            <div class="card mb-3 border bg-light-subtle">
+                                <div class="card-body">
+
+                                    {% if social_form.non_field_errors %}
+                                        <div class="alert alert-danger">
+                                            {{ social_form.non_field_errors }}
+                                        </div>
+                                    {% endif %}
+
+                                    {{ social_form|crispy }}
+
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid mt-4">
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg"
+                            >
+                                Register
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
 
         </div>
-
-    {% endfor %}
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
+    </div>
 </div>
 {% endblock %}

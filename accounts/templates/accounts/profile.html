@@ -2,7 +2,7 @@
 {% load humanize %}
 {%  load jalali_tags %}
 {% block title %}
-{{ user.username }} Profile
+{{ profile_user.username }} Profile
 {% endblock %}
 
 {% block main %}
@@ -31,8 +31,8 @@
                     <div class="position-absolute"
                          style="top: -70px; left: 40px;">
 
-                        <img src="{{ user.profile_picture.url }}"
-                             alt="{{ user.username }}"
+                        <img src="{{ profile_user.profile_picture.url }}"
+                             alt="{{ profile_user.username }}"
                              class="rounded-circle border border-4 border-white shadow"
                              width="140"
                              height="140"
@@ -42,8 +42,8 @@
                     <!-- Edit Button -->
                     <div class="text-end">
 
-                        {% if request.user == user %}
-                        <a href="{% url 'profile_update' user.pk %}"
+                        {% if is_owner %}
+                        <a href="{% url 'profile_update' profile_user.pk %}"
                            class="btn btn-outline-primary rounded-pill px-4">
 
                             <i class="bi bi-pencil-square"></i>
@@ -58,19 +58,19 @@
                     <div class="mt-5 pt-4">
 
                         <h2 class="fw-bold mb-1">
-                            {{ user.get_full_name|default:user.username }}
+                            {{ profile_user.get_full_name|default:profile_user.username }}
                         </h2>
 
                         <p class="text-muted mb-3 fs-5">
-                            @{{ user.username }}
+                            @{{ profile_user.username }}
                         </p>
 
                         <!-- Bio -->
-                        {% if user.bio %}
+                        {% if profile_user.bio %}
                         <p class="text-secondary fs-6"
                            style="line-height: 1.9; max-width: 800px;">
 
-                            {{ user.bio }}
+                            {{ profile_user.bio }}
 
                         </p>
                         {% endif %}
@@ -78,23 +78,23 @@
                         <!-- Meta -->
                         <div class="d-flex flex-wrap gap-4 mt-4">
 
-                            {% if user.city %}
+                            {% if profile_user.city %}
                             <div class="text-muted">
                                 <i class="bi bi-geo-alt-fill"></i>
-                                {{ user.city }}
+                                {{ profile_user.city }}
                             </div>
                             {% endif %}
 
-                            {% if user.phone %}
+                            {% if profile_user.phone %}
                             <div class="text-muted">
                                 <i class="bi bi-telephone-fill"></i>
-                                {{ user.phone }}
+                                {{ profile_user.phone }}
                             </div>
                             {% endif %}
 
                             <div class="text-muted">
                                 <i class="bi bi-calendar-event-fill"></i>
-                                Joined {{ user.date_joined|jalali }}
+                                Joined {{ profile_user.date_joined|jalali }}
                             </div>
 
                         </div>
@@ -119,11 +119,11 @@
                                 Social Links
                             </h5>
 
-                            {% if user.social_links.all %}
+                            {% if profile_user.social_links.all %}
 
                                 <div class="d-grid gap-3">
 
-                                    {% for social in user.social_links.all %}
+                                    {% for social in profile_user.social_links.all %}
 
                                     <a href="{{ social.url }}"
                                        target="_blank"
@@ -214,7 +214,7 @@
                                     <div class="bg-light rounded-4 p-3">
 
                                         <h3 class="fw-bold text-primary mb-1">
-                                            {{ user.post_set.count }}
+                                            {{ profile_user.post_set.count }}
                                         </h3>
 
                                         <small class="text-muted">
@@ -230,7 +230,7 @@
                                     <div class="bg-light rounded-4 p-3">
 
                                         <h3 class="fw-bold text-success mb-1">
-                                            {{ user.social_links.count }}
+                                            {{ profile_user.social_links.count }}
                                         </h3>
 
                                         <small class="text-muted">
@@ -263,12 +263,12 @@
                                 </h4>
 
                                 <span class="badge bg-primary rounded-pill px-3 py-2">
-                                    {{ user.post_set.count }} Posts
+                                    {{ profile_user.post_set.count }} Posts
                                 </span>
 
                             </div>
 
-                            {% for post in user.post_set.all %}
+                            {% for post in profile_user.post_set.all %}
 
                             <!-- POST ITEM -->
                             <div class="border rounded-4 p-4 mb-4">

@@ -21,7 +21,7 @@ path(
     "reports/posts/monthly/",
     PostMonthlyReportView.as_view(),
     name="post_monthly_report"
-)
+),
 
 ]
 
