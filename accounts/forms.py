@@ -3,7 +3,7 @@ from accounts.models import CustomUser, SocialLink
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Submit, Layout, Field
 from django.contrib.auth.hashers import make_password
-
+from django.core.files.storage import FileSystemStorage
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -98,4 +98,37 @@ class SocialLinkForm(forms.ModelForm):
                 'url',
             ),
             )
-        
+
+
+class ContactForm1(forms.Form):
+    subject = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    sender = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Fieldset(
+                "Contact Form",
+                'subject',
+                'sender',
+            ),
+            )
+
+
+class ContactForm2(forms.Form):
+    message = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
+    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'class':'form-control'}))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Fieldset(
+                "Contact Form",
+                'message',
+                'file',
+            )
+        )

@@ -1,16 +1,25 @@
+import os
+from django.conf import settings
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth import login, authenticate, logout
-from django.views.generic import CreateView, FormView, DetailView, TemplateView
-from accounts.forms import RegisterForm, SocialLinkForm, UserUpdateForm
-from accounts.models import CustomUser, SocialLink
+from django.views.generic import CreateView, FormView, DetailView, TemplateView, ListView
+from django_tables2 import SingleTableMixin
+
+from accounts.forms import RegisterForm, SocialLinkForm, UserUpdateForm, ContactForm1, ContactForm2
+from accounts.models import CustomUser, SocialLink, Contact
 from extra_views import UpdateWithInlinesView, InlineFormSetFactory, CreateWithInlinesView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django_otp.plugins.otp_totp.models import TOTPDevice
 import qrcode
 from django.db import transaction
-from core.tasks import send_welcome_email
 
+from core.tables import ContactTable
+from core.tasks import send_welcome_email
+from formtools.wizard.views import SessionWizardView
+from django.core.files.storage import FileSystemStorage
+from django_filters.views import FilterView
+from core.filters import ContactFilter
 
 from PIL.Image import Image
 class SocialLinkInline(InlineFormSetFactory):
@@ -100,3 +109,55 @@ def login_view(request):
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('login')
 
+
+
+class ContactWizardView(SessionWizardView):
+    form_list = [
+        ('first', ContactForm1),
+        ('second', ContactForm2),
+    ]
+    TEMPLATES = {
+        'first': 'accounts/contact_form1.html',
+        'second': 'accounts/contact_form1.html',
+    }
+    file_storage = FileSystemStorage(os.path.join(settings.MEDIA_ROOT, 'temp_uploads'))
+    def get_template_names(self):
+        return [self.TEMPLATES[self.steps.current]]
+
+    def done(self, form_list, **kwargs):
+        data = {}
+        for form in form_list:
+            data.update(form.cleaned_data)
+
+        contact = Contact.objects.create(
+            subject=data['subject'],
+            sender=data['sender'],
+            message=data['message'],
+            file=data['file'],
+        )
+
+
+        return redirect('contact_list')
+
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form=form, **kwargs)
+        context.update({
+            'current_step_name': self.steps.current,
+            'total_steps': len(self.form_list),
+            'current_step_number': list(self.form_list).index(self.steps.current) + 1,
+            'progress_percentage': (
+                    (list(self.form_list).index(self.steps.current) + 1)
+                    * 100
+                    / len(self.form_list)
+            )
+        })
+        return context
+
+
+class ContactListView(SingleTableMixin, FilterView):
+    model = Contact
+    template_name = 'accounts/contact_list.html'
+    filterset_class = ContactFilter
+    context_object_name = 'contacts'
+    table_class = ContactTable
+    paginate_by = 5

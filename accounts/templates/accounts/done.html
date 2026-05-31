@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+Done
+{% endblock %}
+
+{% block main %}
+   {% for form in forms %}
+        {{ form|crispy }}
+    {% endfor %}
+    {% endblock %}

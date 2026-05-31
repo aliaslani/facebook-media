@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% load django_tables2 %}
+{% load crispy_forms_tags %}
+{% block title %}
+{% endblock %}
+
+{% block main %}
+    <div class="row d-flex justify-content-between">
+        <form method="get" class="row g-2 align-items-end mb-4">
+
+            <div class="col-md-3">
+                <label class="form-label">{{ filter.form.subject.label }}</label>
+                {{ filter.form.subject }}
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">{{ filter.form.created_at_from.label }}</label>
+                {{ filter.form.created_at_from }}
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">{{ filter.form.created_at_to.label }}</label>
+                {{ filter.form.created_at_to }}
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">{{ filter.form.sender.label }}</label>
+                {{ filter.form.sender }}
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    Filter
+                </button>
+            </div>
+
+        </form>
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                   Contact Messages
+                </div>
+                <div class="card-body">
+                    {% render_table table %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

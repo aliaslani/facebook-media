@@ -36,3 +36,14 @@ class SocialLink(models.Model):
 
 
 
+
+class Contact(models.Model):
+    subject = models.CharField(max_length=64)
+    sender = models.EmailField()
+    message = models.TextField()
+    file = models.FileField(upload_to='contacts/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.subject
+

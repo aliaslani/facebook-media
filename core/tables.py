@@ -1,7 +1,15 @@
 import django_tables2 as tables
+
+from accounts.models import Contact
 from core.models import Post, Comment
 import jdatetime
 
+
+class ContactTable(tables.Table):
+    class Meta:
+        model = Contact
+        template_name = 'django_tables2/bootstrap5.html'
+        fields = ('subject', 'sender', 'created_at')
 class PostTable(tables.Table):
 
     comments_count = tables.Column(verbose_name='Comments Count', empty_values=(), orderable=True)

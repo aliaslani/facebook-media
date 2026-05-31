@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_email',
     'django_huey',
     'django_htmx',
+    'formtools',
 ]
 
 MIDDLEWARE = [#this name will be used in decorators below
