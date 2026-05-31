@@ -1,13 +1,13 @@
 from itertools import count
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 
 
 from core.filters import PostFilter
-from core.models import Post, Comment
+from core.models import Post, Comment, HxPost
 from django.views.generic import ListView, DetailView, CreateView, FormView, UpdateView, DeleteView
-from core.forms import NewPostForm, CommentForm, Comment
+from core.forms import NewPostForm, CommentForm, Comment, HxPostForm
 from django_tables2 import SingleTableView, SingleTableMixin
 from core.tables import PostTable
 from core.tables import CommentTable
@@ -218,4 +218,104 @@ class PostMonthlyReportView(ReportView):
         )
     ]
 
+def post_list(request):
+    context = get_paginated_posts(request)
+    if request.htmx:
+        return render(request, "posts/_table.html", context)
 
+    return render(request, "posts/list.html", context)
+
+def post_create(request):
+    form = HxPostForm(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+
+            if request.htmx:
+                context = get_paginated_posts(request)
+                return render(
+                    request,
+                    "posts/_table.html",
+                    context
+                )
+
+            return redirect("post-list")
+
+    template = (
+        "posts/_modal_form.html"
+        if request.htmx
+        else "posts/create_post.html"
+    )
+
+    return render(request, template, {
+        "form": form
+    })
+
+def post_edit(request, pk):
+    post = get_object_or_404(HxPost, pk=pk)
+
+    form = HxPostForm(request.POST or None, instance=post)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            context = get_paginated_posts(request)
+            return render(
+                request,
+                "posts/_table.html",
+                context
+            )
+
+        return render(
+            request,
+            "posts/_modal_form.html",
+            {
+                "form": form,
+                "post": post
+            }
+        )
+
+    return render(
+        request,
+        "posts/_modal_form.html",
+        {
+            "form": form,
+            "post": post
+        }
+    )
+def post_inline_update(request, pk):
+    post = get_object_or_404(HxPost, pk=pk)
+
+    title = request.POST.get("title", "").strip()
+
+    if title and title != post.title:
+        post.title = title
+        post.save()
+
+    return render(
+        request,
+        "posts/_title_cell.html",
+        {"post": post}
+    )
+def get_paginated_posts(request):
+    qs = HxPost.objects.all().order_by("-created_at")
+
+    search = request.GET.get("search")
+    status = request.GET.get("status")
+
+    if search:
+        qs = qs.filter(title__icontains=search)
+
+    if status:
+        qs = qs.filter(status=status)
+
+    paginator = Paginator(qs, 5)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return {
+        "posts": page_obj.object_list,
+        "page_obj": page_obj,
+    }

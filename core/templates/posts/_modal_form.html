@@ -1,0 +1,11 @@
+<form method="post"
+      hx-post="{% if post %}{% url 'post-edit' post.id %}{% else %}{% url 'post-create' %}{% endif %}"
+      hx-target="#table"
+      hx-swap="innerHTML">
+
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-success">Save</button>
+
+</form>

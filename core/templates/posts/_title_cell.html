@@ -1,0 +1,11 @@
+<input
+    type="text"
+    name="title"
+    value="{{ post.title }}"
+    class="form-control"
+
+    hx-post="{% url 'post-inline' post.id %}"
+    hx-trigger="change"
+    hx-target="#title-cell-{{ post.id }}"
+    hx-swap="outerHTML"
+>

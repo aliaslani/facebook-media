@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_email',
     'django_huey',
+    'django_htmx',
 ]
 
 MIDDLEWARE = [#this name will be used in decorators below
@@ -62,6 +63,7 @@ MIDDLEWARE = [#this name will be used in decorators below
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "django_ratelimit.middleware.RatelimitMiddleware",
     'django_otp.middleware.OTPMiddleware',
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 ROOT_URLCONF = 'facebook.urls'

@@ -2,7 +2,7 @@ from django.forms import Form, ModelForm
 from django import forms
 
 from accounts.models import CustomUser
-from core.models import Post, Comment
+from core.models import Post, Comment, HxPost
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Submit, Layout, Field
 from django_select2 import forms as s2forms
@@ -102,4 +102,14 @@ class CommentForm(ModelForm):
         widgets = {
             'user': UserWidget(),
             'body': forms.Textarea(attrs={'class':'form-control', 'cols':30, 'rows':4}),
+        }
+
+
+class HxPostForm(forms.ModelForm):
+    class Meta:
+        model = HxPost
+        fields = ["title", "status"]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "status": forms.Select(attrs={"class": "form-select"}),
         }

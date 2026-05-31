@@ -1,0 +1,25 @@
+<div class="row mb-3">
+
+    <div class="col">
+        <input class="form-control"
+               name="search"
+               placeholder="Search..."
+               hx-get="{% url 'post-list' %}"
+               hx-trigger="keyup changed delay:300ms"
+               hx-target="#table"
+               hx-include="[name='status']">
+    </div>
+
+    <div class="col">
+        <select class="form-select"
+                name="status"
+                hx-get="{% url 'post-list' %}"
+                hx-trigger="change"
+                hx-target="#table">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+        </select>
+    </div>
+
+</div>

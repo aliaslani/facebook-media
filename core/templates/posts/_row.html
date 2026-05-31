@@ -1,0 +1,21 @@
+<tr>
+
+    <td id="title-cell-{{ post.id }}">
+        {% include "posts/_title_cell.html" %}
+    </td>
+
+    <td>{{ post.status }}</td>
+
+    <td>{{ post.views }}</td>
+
+    <td>
+        <button class="btn btn-sm btn-warning"
+                hx-get="{% url 'post-edit' post.id %}"
+                hx-target="#modal-body"
+                data-bs-toggle="modal"
+                data-bs-target="#modal">
+            Edit
+        </button>
+    </td>
+
+</tr>

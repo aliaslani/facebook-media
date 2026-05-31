@@ -1,0 +1,21 @@
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Views</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for post in posts %}
+            {% include "posts/_row.html" %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- PAGINATION -->
+<div id="pagination">
+    {% include "posts/_pagination.html" %}
+</div>

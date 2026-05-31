@@ -2,7 +2,7 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from core.views import PostListView, PostDetail, NewPost,PostTableView, CommentTableView, UpdatePost, DeletePost,\
-    BarChartView, PieChartView, PostSubmit, PostMonthlyReportView
+    BarChartView, PieChartView, PostSubmit, PostMonthlyReportView, post_list, post_edit, post_create, post_inline_update
 
 urlpatterns = [
     path('', PostListView.as_view(), name='post_list'),
@@ -22,6 +22,9 @@ path(
     PostMonthlyReportView.as_view(),
     name="post_monthly_report"
 ),
-
+path("hxposts/", post_list, name="post-list"),
+    path("hxposts/create/", post_create, name="post-create"),
+    path("hxposts/<int:pk>/edit/", post_edit, name="post-edit"),
+    path("hxposts/<int:pk>/inline/", post_inline_update, name="post-inline"),
 ]
 
