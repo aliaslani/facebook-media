@@ -1,10 +1,18 @@
 from django.urls import path
 from django.views.generic import TemplateView
-
+from rest_framework.routers import DefaultRouter
 from core.views import PostListView, PostDetail, NewPost,PostTableView, CommentTableView, UpdatePost, DeletePost,\
-    BarChartView, PieChartView, PostSubmit, PostMonthlyReportView, post_list, post_edit, post_create, post_inline_update
+    BarChartView, PieChartView, PostSubmit, PostMonthlyReportView, post_list, post_edit, post_create, post_inline_update,\
+    dev_post_list, PostJsonView, PostViewSet
 
-urlpatterns = [
+router = DefaultRouter()
+router.register(r'posts-drf', PostViewSet, basename='posts-drf')
+urlpatterns = router.urls
+
+urlpatterns += [
+    path('devexpress/', PostJsonView.as_view(), name='dev_post_api'),
+    path("devexpress/<int:pk>/", PostJsonView.as_view(), name="dev_post_detail_api"),
+    path('posts/devexpress/', dev_post_list, name='dev_post_list'),
     path('', PostListView.as_view(), name='post_list'),
     path('<int:pk>/', PostDetail.as_view(), name='post_detail'),
     path('post/new/', NewPost.as_view(), name='new_post'),

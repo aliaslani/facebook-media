@@ -1,3 +1,4 @@
+import json
 from itertools import count
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -29,8 +30,16 @@ from braces.views import RecentLoginRequiredMixin
 from braces.views import FormInvalidMessageMixin
 from django_ratelimit.decorators import  ratelimit
 from django.utils.decorators import method_decorator
+from django.views import View
+from django.http import JsonResponse
+from django.db.models import F
+from rest_framework.viewsets import ModelViewSet
+from core.serializers import PostSerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
+from core.utils import DevExtremePagination
 
-
+from django.views.decorators.csrf import csrf_exempt
 # class PostListView(ListView):
 #     model = Post
 #     template_name = 'core/post_list.html'
@@ -42,6 +51,16 @@ def ratelimited_error(request, exception=None):
         "core/429.html",
         status=429,
     )
+
+class PostViewSet(ModelViewSet):
+    queryset = Post.objects.select_related('user').annotate(username=F("user__username"))
+    serializer_class = PostSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_class = PostFilter
+    search_fields = ['title', 'content', 'subject']
+    pagination_class = DevExtremePagination
+
+
 @method_decorator(ratelimit(key='ip', rate='5/m', block=True), name='dispatch')
 class PostListView(RecentLoginRequiredMixin, FilterView):
     model = Post
@@ -51,8 +70,84 @@ class PostListView(RecentLoginRequiredMixin, FilterView):
     paginate_by = 5
     max_last_login_delta = 600000000
     raise_exception = True
+class PostJsonView(View):
+    def get(self, request, pk=None, *args, **kwargs):
+        if pk:
+            post = get_object_or_404(Post, pk=pk)
+            return JsonResponse({
+                "id": post.id,
+                "title": post.title,
+                "content": post.content,
+                "created_at": post.created_at,
+                "user": post.user.username,
+            })
 
- 
+        data = list(
+            Post.objects.annotate(username=F("user__username")).values(
+                "id",
+                "title",
+                "content",
+                "subject",
+                "created_at",
+                "username",
+            )
+        )
+        return JsonResponse(data, safe=False)
+    def post(self, request, *args, **kwargs):
+        try:
+            payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Invalid JSON"},
+                status=400
+            )
+        post = Post.objects.create(
+            title=payload["title"],
+            content=payload["content"],
+            user=request.user,
+        )
+        return JsonResponse(
+            {
+             'id': post.id,
+             'message': 'created successfully',
+             }
+        )
+    def put(self, request, *args, **kwargs):
+        try:
+            payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Invalid JSON"},
+                status=400
+            )
+        post_id = payload["id"]
+        post = Post.objects.get(id=post_id)
+        post.title = payload.get("title") or post.title
+        post.content = payload.get("content") or post.content
+        post.save()
+        return JsonResponse(
+            {
+                "message": "updated successfully",
+            }
+        )
+    def delete(self, request, *args, **kwargs):
+        try:
+            payload = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"error": "Invalid JSON"},
+                status=400
+            )
+        post_id = payload["id"]
+        Post.objects.filter(id=post_id).delete()
+        return JsonResponse(
+            {
+                "message": "deleted successfully",
+            }
+        )
+def dev_post_list(request):
+    config = {"pageSize": 20, "pageTitle": "Post List DevExpress"}
+    return render(request, "core/devexpress.html", {"config": json.dumps(config)})
 class PostDetail(DetailView):
     model = Post
     template_name = 'core/post_detail.html'

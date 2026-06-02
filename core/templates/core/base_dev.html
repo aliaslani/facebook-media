@@ -1,16 +1,27 @@
 {% load static %}
-{% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>
-        {% block title %}   {% endblock %}
+        {% block title %} {% endblock %}
     </title>
-    {% block extra_css %} {% endblock %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    <link rel="icon" href="{% static 'images/facebook.webp' %}">
+
+
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+<link rel="stylesheet"
+          href="https://cdn3.devexpress.com/jslib/25.1.3/css/dx.fluent.blue.light.css">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn3.devexpress.com/jslib/25.1.3/js/dx.all.js"></script>
+ {% block extra_css %}
+
+    {% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
@@ -232,26 +243,16 @@
 
 </nav>
 
-<div class="container py-4">
-{%  if messages %}
-    {% for message in messages %}
-        <div class="position-relative">
-        <div class="position-absolute w-100 alert alert-danger alert-dismissible fade show"><strong>{{ message }} </strong><button class="btn-close" data-bs-dismiss="alert"></button></div>
-        </div>
-    {% endfor %}
-{% endif %}
-    
-    {% block main %}
-
-
-
-
+<div class="container mt-4">
+   {% block content %}
     {% endblock %}
+
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-{% block extra %}
+
+{% block script %}
+
 {% endblock %}
+
+
 </body>
 </html>

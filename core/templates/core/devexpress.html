@@ -1,0 +1,382 @@
+{% extends 'core/base_dev.html' %}
+{% block title %}Post List DevExpress{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div id="gridContainer"></div>
+        <div id="editPopup"></div>
+        <div id="detailPopup"></div>
+        {{ config|json_script:"pageConfig" }}
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        const csrftoken = (function getCookie(name) {
+            let val = null;
+            document.cookie.split(";").forEach(c => {
+                c = c.trim();
+                if (c.startsWith(name + "=")) val = decodeURIComponent(c.slice(name.length + 1));
+            });
+            return val;
+        })("csrftoken");
+        const FIELD_MAP = {
+            title: {param: "title"},
+            content: {param: "content"},
+            subject: {param: "subject"},
+            username: {param: "username"},
+            created_at: {paramGte: "created_at_from", paramLte: "created_at_to"},
+        };
+
+        function extractFilters(filter, params) {
+            if (!Array.isArray(filter)) return;
+
+            if (typeof filter[0] === "string") {
+                applySingleFilter(filter[0], filter[1], filter[2], params);
+                return;
+            }
+
+            filter.forEach(item => {
+                if (Array.isArray(item)) extractFilters(item, params);
+            });
+        }
+
+        function applySingleFilter(field, operator, value, params) {
+            const mapping = FIELD_MAP[field];
+            if (!mapping || value === null || value === undefined || value === "") return;
+
+            if (field === "created_at") {
+                if (operator === ">=" || operator === ">") params[mapping.paramGte] = value;
+                if (operator === "<=" || operator === "<") params[mapping.paramLte] = value;
+                if (operator === "=") {
+                    params[mapping.paramGte] = value;
+                    params[mapping.paramLte] = value;
+                }
+            } else {
+                params[mapping.param] = value;
+            }
+        }
+
+        $(function () {
+
+            // ── CustomStore ──────────────────────────────────────────────────────────
+            const store = new DevExpress.data.CustomStore({
+                key: "id",
+
+                load(loadOptions) {
+                    const skip = loadOptions.skip || 0;
+                    const take = loadOptions.take || 10;
+                    const params = {page: Math.floor(skip / take) + 1, page_size: take};
+
+                    if (loadOptions.searchValue) params.search = loadOptions.searchValue;
+                    if (loadOptions.sort?.length)
+                        params.ordering = loadOptions.sort
+                            .map(s => (s.desc ? "-" : "") + s.selector).join(",");
+
+                    if (loadOptions.filter) {
+                        extractFilters(loadOptions.filter, params);
+                    }
+                    return $.get("/posts-drf/", params);
+                },
+
+                insert(values) {
+                    return $.ajax({
+                        url: "/posts-drf/",
+                        method: "POST",
+                        contentType: "application/json",
+                        headers: {"X-CSRFToken": csrftoken},
+                        data: JSON.stringify(values)
+                    });
+                },
+
+                update(key, values) {
+                    return $.ajax({
+                        url: `/posts-drf/${key}/`,
+                        method: "PATCH",
+                        contentType: "application/json",
+                        headers: {"X-CSRFToken": csrftoken},
+                        data: JSON.stringify(values)
+                    });
+                },
+
+                remove(key) {
+                    return $.ajax({
+                        url: `/posts-drf/${key}/`,
+                        method: "DELETE",
+                        headers: {"X-CSRFToken": csrftoken}
+                    });
+                },
+
+                byKey(key) {
+                    return $.get(`/posts-drf/${key}/`);
+                }
+            });
+
+            // ── Detail popup (read-only) ─────────────────────────────────────────────
+            const detailPopup = $("#detailPopup").dxPopup({
+                width: 700,
+                height: "auto",
+                showCloseButton: true,
+                hideOnOutsideClick: true,
+                visible: false,
+                title: "Post detail",
+            }).dxPopup("instance");
+
+            function showDetail(data) {
+                detailPopup.option("title", `Post #${data.id} — ${data.title}`);
+
+                const $content = detailPopup.content();
+                $content.empty();
+
+                $("<div>").css({padding: "1rem"}).append(
+                    $("<h5>").text(data.title),
+                    $("<hr>"),
+                    $("<p>").css({whiteSpace: "pre-wrap"}).text(data.content),
+                    $("<div>").css({display: "flex", justifyContent: "space-between", marginTop: "1rem"}).append(
+                        $("<small class='text-muted'>").text(`Subject: ${data.subject || "—"}`),
+                        $("<small class='text-muted'>").text(`Author: ${data.username}`),
+                        $("<small class='text-muted'>").text(
+                            `Created: ${new Date(data.created_at).toLocaleString()}`
+                        )
+                    )
+                ).appendTo($content);
+
+                detailPopup.show();
+            }
+
+            // ── Edit / Create popup ──────────────────────────────────────────────────
+            const editPopup = $("#editPopup").dxPopup({
+                width: 700,
+                height: "auto",
+                showCloseButton: true,
+                hideOnOutsideClick: false,
+                visible: false,
+                title: "Post",
+                contentTemplate(contentElement) {
+                    $("<div id='postForm'>").appendTo(contentElement);
+                },
+                onHidden() {
+                    const $f = $("#postForm");
+                    if ($f.data("dxForm")) $f.dxForm("dispose");
+                },
+                toolbarItems: [
+                    {
+                        widget: "dxButton",
+                        toolbar: "bottom",
+                        location: "after",
+                        options: {text: "Save", type: "success", onClick: savePost}
+                    },
+                    {
+                        widget: "dxButton",
+                        toolbar: "bottom",
+                        location: "after",
+                        options: {
+                            text: "Cancel", onClick() {
+                                editPopup.hide();
+                            }
+                        }
+                    }
+                ]
+            }).dxPopup("instance");
+
+            function openEditPopup(data = null) {
+                const formData = data
+                    ? {id: data.id, title: data.title, content: data.content, subject: data.subject}
+                    : {title: "", content: "", subject: ""};
+
+                editPopup.option("title", data ? `Edit post #${data.id}` : "New post");
+
+                const $content = editPopup.content();
+                const $form = $("#postForm", $content);
+                if ($form.data("dxForm")) $form.dxForm("dispose");
+
+                $form.dxForm({
+                    formData,
+                    labelLocation: "top",
+                    colCount: 1,
+                    items: [
+                        {
+                            dataField: "title",
+                            editorType: "dxTextBox",
+                            label: {text: "Title"},
+                            validationRules: [{type: "required", message: "Title is required"}]
+                        },
+                        {
+                            dataField: "subject",
+                            editorType: "dxTextBox",
+                            label: {text: "Subject"}
+                        },
+                        {
+                            dataField: "content",
+                            editorType: "dxTextArea",
+                            label: {text: "Content"},
+                            editorOptions: {height: 220},
+                            validationRules: [{type: "required", message: "Content is required"}]
+                        }
+                    ]
+                });
+
+                editPopup.show();
+            }
+
+            function savePost() {
+                const form = $("#postForm").dxForm("instance");
+                if (!form.validate().isValid) return;
+
+                const values = form.option("formData");
+                const isUpdate = !!values.id;
+
+                (isUpdate ? store.update(values.id, values) : store.insert(values))
+                    .then(() => {
+                        grid.refresh();
+                        editPopup.hide();
+                        DevExpress.ui.notify(
+                            isUpdate ? "Post updated." : "Post created.",
+                            "success", 2500
+                        );
+                    })
+                    .catch(err => {
+                        const msg = err.responseJSON
+                            ? Object.values(err.responseJSON).flat().join(" ")
+                            : err.message;
+                        DevExpress.ui.notify(`Save failed: ${msg}`, "error", 4000);
+                    });
+            }
+
+            // ── Grid ─────────────────────────────────────────────────────────────────
+            const grid = $("#gridContainer").dxDataGrid({
+
+                dataSource: store,
+                keyExpr: "id",
+                showBorders: true,
+                rowAlternationEnabled: true,
+
+                remoteOperations: {paging: true, sorting: true, filtering: true},
+                paging: {pageSize: 10},
+                pager: {showPageSizeSelector: true, allowedPageSizes: [10, 25, 50]},
+
+                searchPanel: {visible: true},
+                filterRow: {visible: true},
+
+                editing: {allowAdding: false, allowUpdating: false, allowDeleting: false},
+
+                columns: [
+                    {dataField: "id", width: 60, allowFiltering: false},
+                    {
+                        dataField: "title",
+                        selectedFilterOperation: "contains",
+                        filterOperations: ["contains", "startswith", "="]
+                    },
+                    {
+                        dataField: "content",
+                        selectedFilterOperation: "contains",
+                        filterOperations: ["contains", "startswith", "="]
+                    },
+                    {
+                        dataField: "subject",
+                        editorType: "dxSelectBox",
+                        label: {text: "Subject"},
+                        editorOptions: {
+                            dataSource: [
+                                {value: "SP", text: "Sports"},
+                                {value: "NW", text: "News"},
+                                {value: "TC", text: "Technology"}
+                            ],
+                            valueExpr: "value",
+                            displayExpr: "text"
+                        }
+                    },
+                    {
+                        dataField: "username",
+                        caption: "Author",
+                        allowFiltering: true,
+                        selectedFilterOperation: "contains",
+                        filterOperations: ["=", "contains"],
+                    },
+                    {
+                        dataField: "created_at",
+                        caption: "Created",
+                        dataType: "datetime",
+                        selectedFilterOperation: "between",
+                        filterOperations: ["=", ">=", "<=", "between"],
+                        width: 160
+                    },
+                    // ── fix 1: action icons side by side ────────────────────────────────────────
+                    {
+                        caption: "Actions",
+                        width: 110,
+                        alignment: "center",
+                        allowSorting: false,
+                        cellTemplate(container, options) {
+                            const $wrap = $("<div>").css({
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: "8px"
+                            });
+
+                            // eye
+                            $("<div>")
+                                .addClass("dx-link dx-icon-info")
+                                .attr("title", "View detail")
+                                .css({cursor: "pointer", fontSize: "20px", color: "#185FA5"})
+                                .on("click", () => showDetail(options.data))
+                                .appendTo($wrap);
+
+                            // edit
+                            $("<div>")
+                                .addClass("dx-link dx-icon-edit")
+                                .attr("title", "Edit post")
+                                .css({cursor: "pointer", fontSize: "20px", color: "#3B6D11"})
+                                .on("click", () => openEditPopup(options.data))
+                                .appendTo($wrap);
+
+                            $("<div>")
+                                .addClass("dx-link dx-icon-trash")
+                                .attr("title", "Delete post")
+                                .css({cursor: "pointer", fontSize: "20px", color: "#A32D2D"})
+                                .on("click", () => {
+                                    DevExpress.ui.dialog.confirm(
+                                        `Delete <b>${options.data.title}</b>?`, "Confirm delete"
+                                    ).done(confirmed => {
+                                        if (!confirmed) return;
+                                        store.remove(options.data.id)
+                                            .then(() => {
+                                                grid.refresh();
+                                                DevExpress.ui.notify("Post deleted.", "warning", 2000);
+                                            })
+                                            .catch(err =>
+                                                DevExpress.ui.notify(`Delete failed: ${err.message}`, "error", 3000)
+                                            );
+                                    });
+                                })
+                                .appendTo($wrap);
+
+                            container.append($wrap);
+                        }
+                    }
+                ],
+
+                toolbar: {
+                    items: [
+                        {
+                            location: "before",
+                            widget: "dxButton",
+                            options: {
+                                text: "Add post",
+                                icon: "add",
+                                type: "default",
+                                onClick() {
+                                    openEditPopup();
+                                }
+                            }
+                        },
+                        "searchPanel"
+                    ]
+                }
+
+            }).dxDataGrid("instance");
+
+        });
+    </script>
+{% endblock %}
