@@ -203,8 +203,16 @@
                         },
                         {
                             dataField: "subject",
-                            editorType: "dxTextBox",
-                            label: {text: "Subject"}
+                            editorType: "dxSelectBox",
+                            label: {text: "Subject"},
+                            editorOptions: {
+                                dataSource: ["SP", "EC", "PO"],
+                                placeholder: "Select subject",
+                                searchEnabled: true
+                            },
+                            validationRules: [
+                                {type: "required", message: "Subject is required"}
+                            ]
                         },
                         {
                             dataField: "content",
@@ -221,25 +229,27 @@
 
             function savePost() {
                 const form = $("#postForm").dxForm("instance");
-                if (!form.validate().isValid) return;
 
-                const values = form.option("formData");
-                const isUpdate = !!values.id;
+                if (!form.validate().isValid)
+                    return;
 
-                (isUpdate ? store.update(values.id, values) : store.insert(values))
+                const values = {...form.option("formData")};
+
+                const id = values.id;
+                const isUpdate = !!id;
+
+                delete values.id;
+                delete values.created_at;
+                delete values.username;
+
+                console.log(values);
+
+                (isUpdate
+                    ? store.update(id, values)
+                    : store.insert(values))
                     .then(() => {
                         grid.refresh();
                         editPopup.hide();
-                        DevExpress.ui.notify(
-                            isUpdate ? "Post updated." : "Post created.",
-                            "success", 2500
-                        );
-                    })
-                    .catch(err => {
-                        const msg = err.responseJSON
-                            ? Object.values(err.responseJSON).flat().join(" ")
-                            : err.message;
-                        DevExpress.ui.notify(`Save failed: ${msg}`, "error", 4000);
                     });
             }
 
@@ -261,7 +271,7 @@
                 editing: {allowAdding: false, allowUpdating: false, allowDeleting: false},
 
                 columns: [
-                    {dataField: "id", width: 60, allowFiltering: false},
+                    {dataField: "id", width: 80, allowFiltering: false},
                     {
                         dataField: "title",
                         selectedFilterOperation: "contains",
@@ -277,11 +287,11 @@
                         editorType: "dxSelectBox",
                         label: {text: "Subject"},
                         editorOptions: {
-                            dataSource: [
-                                {value: "SP", text: "Sports"},
-                                {value: "NW", text: "News"},
-                                {value: "TC", text: "Technology"}
-                            ],
+                            dataSource: new DevExpress.data.CustomStore({
+                                key: "value",
+                                loadMode: "raw",
+                                load: () => $.getJSON("/subject-choices/")
+                            }),
                             valueExpr: "value",
                             displayExpr: "text"
                         }

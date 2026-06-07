@@ -2,8 +2,9 @@ from django.db import models
 
 
 class SubjectChoice(models.TextChoices):
-    sport = ('1', 'sport')
-    social = ('2', 'social')
+    sport = 'SP', 'Sport'
+    economy = 'EC', 'Economy'
+    politics = 'PO', 'Politics'
 
 class Post(models.Model):
     title = models.CharField(max_length=64)

@@ -38,8 +38,19 @@ from core.serializers import PostSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 from core.utils import DevExtremePagination
-
+from rest_framework import status
+from rest_framework.response import Response
+from core.models import SubjectChoice
 from django.views.decorators.csrf import csrf_exempt
+
+def subject_choices(request):
+    data = [
+        {
+            "value": value,
+            "text": label
+        } for value, label in SubjectChoice.choices
+    ]
+    return JsonResponse(data, safe=False)
 # class PostListView(ListView):
 #     model = Post
 #     template_name = 'core/post_list.html'
@@ -60,7 +71,27 @@ class PostViewSet(ModelViewSet):
     search_fields = ['title', 'content', 'subject']
     pagination_class = DevExtremePagination
 
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
 
+        print("PATCH DATA:", request.data)
+
+        serializer = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=True
+        )
+
+        if not serializer.is_valid():
+            print("ERRORS:", serializer.errors)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer.save()
+
+        return Response(serializer.data)
 @method_decorator(ratelimit(key='ip', rate='5/m', block=True), name='dispatch')
 class PostListView(RecentLoginRequiredMixin, FilterView):
     model = Post

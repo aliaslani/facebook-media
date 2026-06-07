@@ -22,3 +22,4 @@ class PostSerializer(ModelSerializer):
             attrs['user'] = user
         else:
             raise serializers.ValidationError({'user': 'User must be authenticated'})
+        return attrs
