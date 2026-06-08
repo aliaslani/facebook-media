@@ -76,12 +76,12 @@
                     if (loadOptions.filter) {
                         extractFilters(loadOptions.filter, params);
                     }
-                    return $.get("/posts-drf/", params);
+                    return $.get("/api/posts-drf/", params);
                 },
 
                 insert(values) {
                     return $.ajax({
-                        url: "/posts-drf/",
+                        url: "/api/posts-drf/",
                         method: "POST",
                         contentType: "application/json",
                         headers: {"X-CSRFToken": csrftoken},
@@ -91,7 +91,7 @@
 
                 update(key, values) {
                     return $.ajax({
-                        url: `/posts-drf/${key}/`,
+                        url: `/api/posts-drf/${key}/`,
                         method: "PATCH",
                         contentType: "application/json",
                         headers: {"X-CSRFToken": csrftoken},
@@ -101,14 +101,14 @@
 
                 remove(key) {
                     return $.ajax({
-                        url: `/posts-drf/${key}/`,
+                        url: `/api/posts-drf/${key}/`,
                         method: "DELETE",
                         headers: {"X-CSRFToken": csrftoken}
                     });
                 },
 
                 byKey(key) {
-                    return $.get(`/posts-drf/${key}/`);
+                    return $.get(`/api/posts-drf/${key}/`);
                 }
             });
 

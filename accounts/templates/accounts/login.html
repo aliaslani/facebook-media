@@ -6,7 +6,7 @@
 {% block main %}
 <div class="container mt-5">
     <h2>Login</h2>
-    <form method="post">
+    <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-primary">Login</button> <a href="{% url 'register' %}">Don't have an account? Register here.</a>

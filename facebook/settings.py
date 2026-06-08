@@ -312,16 +312,21 @@ DJANGO_HUEY = {
         'first': {
             'huey_class': 'huey.RedisHuey',
             'name': 'first_tasks',
+            'results': True,
+            'store_none': False,
+            'immediate': False,
+            'utc': True,
             'consumer': {
-                'workers': 3,
+                'workers': 2,
                 'worker_type': 'thread',
             },
         },
         'emails': {
             'huey_class': 'huey.RedisHuey',
             'name': 'emails_tasks',
+            'results': True,
             'consumer': {
-                'workers': 2,
+                'workers': 1,
                 'worker_type': 'thread',
             },
         }

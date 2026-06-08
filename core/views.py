@@ -240,7 +240,7 @@ class CommentTableView(SingleTableView):
     paginate_by = 5
 
 
-class UpdatePost(UpdateView, LoginRequiredMixin, UserPassesTestMixin):
+class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     form_class = NewPostForm
     template_name = 'core/edit_post.html'

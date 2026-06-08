@@ -20,7 +20,8 @@ from formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django_filters.views import FilterView
 from core.filters import ContactFilter
-
+from core.permissions import IsSelfMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from PIL.Image import Image
 class SocialLinkInline(InlineFormSetFactory):
     model = SocialLink
@@ -52,7 +53,7 @@ class RegisterView(CreateWithInlinesView):
 
 
 
-class ProfileView(DetailView):
+class ProfileView(LoginRequiredMixin, IsSelfMixin, DetailView):
     model = CustomUser
     template_name = 'accounts/profile.html'
     context_object_name = 'profile_user'
@@ -62,18 +63,11 @@ class ProfileView(DetailView):
     )
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['social_links'] = SocialLink.objects.filter(user=self.object)
-        context["is_owner"] = (
-            self.request.user.is_authenticated
-            and self.request.user.id == self.object
+        context.update(
+            {'social_links': self.object.social_links.all()}
         )
         return context
-
-    def get_object(self, queryset=None):
-        user = self.request.user
-        return user
-
-class ProfileUpdateView(UpdateWithInlinesView):
+class ProfileUpdateView(LoginRequiredMixin, IsSelfMixin,UpdateWithInlinesView):
     model = CustomUser
     form_class = UserUpdateForm
     inlines = [SocialLinkInline]
@@ -81,12 +75,20 @@ class ProfileUpdateView(UpdateWithInlinesView):
     def get_success_url(self):
         return reverse_lazy('profile', kwargs={'pk': self.object.pk})
 
+    def get_queryset(self):
+        return CustomUser.objects.filter(pk=self.request.user.pk).prefetch_related(
+            "social_links",
+        )
+
 
 
 
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     success_url = reverse_lazy('post_table')
+
+    def get_success_url(self):
+        return reverse_lazy('profile', kwargs={'pk': self.request.user.id})
 
 def login_view(request):
     device = TOTPDevice.objects.create(
