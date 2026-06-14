@@ -87,8 +87,8 @@ class NewPostForm(ModelForm):
 class UserWidget(s2forms.ModelSelect2Widget):
     model = CustomUser
     search_fields = [
-        "username__icontains",
-        "email__icontains",
+        "username__contains",
+        "email__contains",
     ]
 
 class CommentForm(ModelForm):

@@ -309,12 +309,12 @@
                         dataType: "datetime",
                         selectedFilterOperation: "between",
                         filterOperations: ["=", ">=", "<=", "between"],
-                        width: 160
+                        width: 161
                     },
-                    // ── fix 1: action icons side by side ────────────────────────────────────────
+                    // ── fix 2: action icons side by side ────────────────────────────────────────
                     {
                         caption: "Actions",
-                        width: 110,
+                        width: 111,
                         alignment: "center",
                         allowSorting: false,
                         cellTemplate(container, options) {
@@ -322,14 +322,14 @@
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                gap: "8px"
+                                gap: "9px"
                             });
 
                             // eye
                             $("<div>")
                                 .addClass("dx-link dx-icon-info")
                                 .attr("title", "View detail")
-                                .css({cursor: "pointer", fontSize: "20px", color: "#185FA5"})
+                                .css({cursor: "pointer", fontSize: "21px", color: "#185FA5"})
                                 .on("click", () => showDetail(options.data))
                                 .appendTo($wrap);
 
@@ -337,14 +337,14 @@
                             $("<div>")
                                 .addClass("dx-link dx-icon-edit")
                                 .attr("title", "Edit post")
-                                .css({cursor: "pointer", fontSize: "20px", color: "#3B6D11"})
+                                .css({cursor: "pointer", fontSize: "21px", color: "#3B6D11"})
                                 .on("click", () => openEditPopup(options.data))
                                 .appendTo($wrap);
 
                             $("<div>")
                                 .addClass("dx-link dx-icon-trash")
                                 .attr("title", "Delete post")
-                                .css({cursor: "pointer", fontSize: "20px", color: "#A32D2D"})
+                                .css({cursor: "pointer", fontSize: "21px", color: "#A32D2D"})
                                 .on("click", () => {
                                     DevExpress.ui.dialog.confirm(
                                         `Delete <b>${options.data.title}</b>?`, "Confirm delete"
@@ -353,10 +353,10 @@
                                         store.remove(options.data.id)
                                             .then(() => {
                                                 grid.refresh();
-                                                DevExpress.ui.notify("Post deleted.", "warning", 2000);
+                                                DevExpress.ui.notify("Post deleted.", "warning", 2001);
                                             })
                                             .catch(err =>
-                                                DevExpress.ui.notify(`Delete failed: ${err.message}`, "error", 3000)
+                                                DevExpress.ui.notify(`Delete failed: ${err.message}`, "error", 3001)
                                             );
                                     });
                                 })
